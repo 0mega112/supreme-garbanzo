@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fyber Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body class="dashboard-page">
+
+    <div class="dashboard-container">
+        
+        <!-- Header -->
+        <header class="dash-header">
+            <h1 class="welcome-text">
+                <span class="line-bold">Добро пожаловать</span><br>
+                <span class="line-regular">в личный кабинет</span>
+            </h1>
+            <div class="brand-container">
+                <img src="images/box.png" alt="Fyber Logo" class="main-logo">
+            </div>
+        </header>
+
+        <!-- Balance Card -->
+        <div class="card balance-card">
+            <div class="card-header">
+                <span class="card-label">Общий Баланс</span>
+                <a href="balance.html" class="details-link">Подробнее ></a>
+            </div>
+            <div class="balance-display-box">
+                <span id="display-balance" class="balance-amount">$0</span>
+            </div>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="card profile-card">
+            <div class="profile-icon-box">
+                <img src="images/user.png" alt="User Icon" class="user-avatar">
+            </div>
+            <div class="profile-info">
+                <h2 class="username" id="display-username">ЗАГРУЗКА...</h2>
+                <p class="user-id">ID: <span id="display-id">...</span></p>
+                <button class="profile-btn" onclick="window.location.href='profile.html'">Профиль</button>            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <span>Меню</span>
+        </a>
+        <a href="balance.html" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+            </svg>
+        </a>
+        
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Отримуємо ID, який зберіг екран входу
+            const savedID = localStorage.getItem("fyber_current_id");
+            
+            // Якщо ID немає, викидаємо на вхід
+            if (!savedID) { 
+                window.location.href = "index.html"; 
+                return; 
+            }
+            
+            // Показуємо ID
+            document.getElementById('display-id').textContent = savedID;
+
+            try {
+                // 2. Робимо запит до файлу балансів
+                // Важливо: шлях має бути правильним відносно html файлу
+                const response = await fetch('../json_handler/balances.json'); 
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // 3. Шукаємо користувача по ID в JSON
+                    const userData = data[savedID];
+                    
+                    if (userData) {
+                        // Оновлюємо дані на сторінці
+                        document.getElementById('display-balance').textContent = '$' + userData.balance;
+                        
+                        // Перевірка, чи є ім'я, інакше ставимо дефолт
+                        const userName = userData.username || "USER";
+                        document.getElementById('display-username').textContent = userName;
+                    }
+                } else {
+                    console.error("Не вдалося завантажити balances.json");
+                }
+            } catch (e) {
+                console.error("Помилка з'єднання:", e);
+            }
+        });
+
+        function logout() { 
+            localStorage.clear(); 
+            window.location.href = "index.html"; 
+        }
+    </script>
+</body>
+</html>

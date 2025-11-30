@@ -1,0 +1,18 @@
+{
+  "123456": {
+    "balance": "400",
+    "username": "user1"
+  },
+  "1111": {
+    "balance": "1100",
+    "username": "user2"
+  },
+  "2222": {
+    "balance": "0",
+    "username": "userok"
+  },
+  "3333": {
+    "balance": "0",
+    "username": "user3"
+  }
+}

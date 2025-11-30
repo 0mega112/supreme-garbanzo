@@ -1,0 +1,307 @@
+/* 1. IMPORT THE FONT "UNBOUNDED" */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --bg-color: #050805;
+    --text-white: #ffffff;
+    --accent-green: #2ecc71;
+    --card-bg: rgba(10, 20, 15, 0.7);
+    --border-green: #1a3a2a;
+    --glow-custom: rgba(56, 255, 126, 0.3); 
+    --text-grey: #6e7f75; 
+    --text-light-green: #C0E4CD; 
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Unbounded', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: #020302;
+    background: linear-gradient(180deg, #000000 0%, #001a00 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: flex-start; 
+    flex-direction: column;
+    color: var(--text-white);
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior: none;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/lines.png');
+    background-repeat: repeat; 
+    background-size: 350px auto;      
+    opacity: 0.3; 
+    z-index: 0; 
+    pointer-events: none; 
+}
+
+.page-container {
+    width: 100%;
+    max-width: 420px; 
+    margin: 0 auto;
+    padding: 20px;
+    padding-bottom: 120px;
+    position: relative; 
+    z-index: 1; 
+}
+
+/* --- Header --- */
+.page-header {
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: #e0f2e9;
+    padding-left: 5px;
+}
+
+/* --- User Info Card --- */
+.user-info-card {
+    background-color: #080f0b;
+    border: 1px solid #15251d;
+    border-radius: 30px;
+    padding: 20px;
+    margin-bottom: 50px;
+    
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    
+    /* Slight blur to match dashboard */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.avatar-container {
+    flex-shrink: 0;
+}
+
+/* ОНОВЛЕНИЙ БЛОК АВАТАРА (Як у Dashboard) */
+.avatar-box {
+    width: 110px; 
+    height: 110px; 
+    background: transparent; /* Прозорий фон */
+    border: none;
+    box-shadow: none;
+    position: relative; 
+    margin-left: -10px; 
+    margin-right: 10px;
+    flex-shrink: 0;
+    /* Видалено overflow: hidden, щоб картинка могла виступати */
+}
+
+/* ОНОВЛЕНА КАРТИНКА (Overlay + Tilt) */
+.avatar-img {
+    width: 150%;
+    height: 175%;
+    object-fit: contain; 
+    position: absolute;
+    top: 0;
+    left: 50%;
+    /* Центрування та нахил -6 градусів */
+    transform: translate(-47%, -22%) rotate(0deg);
+    z-index: 10;
+}
+
+.info-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.username {
+    font-size: 22px;
+    font-weight: 600;
+    color: #e0f2e9;
+    margin-bottom: 2px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1.1;
+}
+
+.user-id {
+    font-size: 14px;
+    font-weight: 500;
+    color: #55665f;
+    margin-bottom: 15px;
+}
+
+.copy-btn {
+    background: transparent;
+    border: 1px solid #1f3a2d;
+    color: #6e7f75;
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    font-family: 'Unbounded', sans-serif;
+    width: fit-content;
+}
+
+.copy-btn:active {
+    background: rgba(46, 204, 113, 0.1);
+    border-color: #2ecc71;
+    color: #2ecc71;
+}
+
+/* --- Menu List (Green Buttons) --- */
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* --- ADDED ANIMATION KEYFRAMES --- */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.menu-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    
+    /* UPDATED GRADIENT based on your screenshot settings */
+    /* Stops: 0% (#27663A), 10% (#225232), 29% (#193623), 92% (#030C07) */
+    background: linear-gradient(90deg, #27663A 0%, #225232 10%, #193623 29%, #030C07 92%);
+    
+    border-radius: 20px;
+    padding: 15px 25px; 
+    
+    border: 1px solid #1a4d2e;
+    
+    position: relative;
+    overflow: hidden;
+    height: 90px;
+    
+    /* MODIFIED: Added Animation Properties */
+    opacity: 0; /* Start hidden */
+    animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    transition: transform 0.1s;
+    
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* MODIFIED: Added delays so buttons appear one by one */
+.menu-card:nth-child(1) { animation-delay: 0.1s; }
+.menu-card:nth-child(2) { animation-delay: 0.2s; }
+.menu-card:nth-child(3) { animation-delay: 0.3s; }
+.menu-card:nth-child(4) { animation-delay: 0.4s; }
+.menu-card:nth-child(5) { animation-delay: 0.5s; }
+.menu-card:nth-child(6) { animation-delay: 0.6s; }
+
+.menu-card:active {
+    transform: scale(0.98);
+}
+
+.menu-text {
+    font-size: 18px;
+    font-weight: 400;
+    color: #e0f2e9;
+    line-height: 1.2;
+    z-index: 2;
+}
+
+.menu-icon-box {
+    width: 60px;
+    height: 60px;
+    background: #050a07; /* Dark box background for icon */
+    border-radius: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #2e5545;
+    
+    /* The "3D / Sticker" look (Rotated) */
+    transform: rotate(8deg);
+    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+    z-index: 2;
+}
+
+/* --- Bottom Navigation --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 30px; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    background: rgba(8, 12, 10, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 35px;
+    
+    /* Using Flexbox for standard alignment */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    padding: 8px 12px;
+    border: 1px solid #1a1a1a;
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b4d42;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 50%;
+    transition: transform 0.1s ease, background 0.3s ease;
+}
+
+.nav-item:active {
+    transform: scale(0.9);
+}
+
+/* ACTIVE BUTTON STYLE (Green Gradient Pill for Profile) */
+.nav-item.active {
+    background: linear-gradient(90deg, #1b5e35 0%, #0f3d24 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.25);
+    border: 1px solid #2a7a45;
+    gap: 8px;
+}
+
+.nav-item.active span {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.nav-item span {
+    display: none;
+}

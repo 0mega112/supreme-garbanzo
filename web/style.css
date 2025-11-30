@@ -1,0 +1,203 @@
+/* 1. IMPORT THE FONT "UNBOUNDED" */
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@200;300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --bg-color: #050805;
+    --text-white: #ffffff;
+    --accent-green: #2ecc71;
+    --input-bg: #0a140d;
+    --border-green: #1a3a2a;
+    --glow-custom: rgba(56, 255, 126, 0.4); /* Brighter glow */
+    --text-light-green: #C0E4CD; 
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Unbounded', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    background-color: #020302;
+    /* Updated Gradient: Black to Green (Matches Dashboard) */
+    background: linear-gradient(180deg, #000000 0%, #001a00 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-white);
+    
+    touch-action: manipulation;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior: none;
+    position: relative;
+}
+
+/* Background Noise */
+body::before {
+    content: "";
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('images/lines.png');
+    background-repeat: repeat; 
+    background-size: 300px auto;     
+    opacity: 0.25; 
+    z-index: 0; 
+    pointer-events: none; 
+}
+
+.screen-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 40px;
+    text-align: center;
+    color: #e0f2e9;
+    letter-spacing: 0.5px;
+}
+
+.input-wrapper {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.id-display {
+    width: 100%;
+    height: 80px; /* Increased height for bigger text */
+    background-color: #080f0b; /* Darker background */
+    border: 1px solid #1a3a2a;
+    border-radius: 20px;
+    
+    /* BIGGER TEXT STYLES */
+    color: #38FF7E; /* Neon Green */
+    font-size: 42px; /* Much bigger numbers */
+    font-weight: 700;
+    letter-spacing: 2px;
+    
+    text-align: center;
+    outline: none;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    user-select: text; 
+}
+
+.id-display::placeholder {
+    color: #1f3a2d;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0;
+}
+
+.sub-link {
+    color: #55665f;
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: 30px;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+/* --- GLOWING BUTTON ANIMATION --- */
+@keyframes btn-pulse {
+    0% { box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); border-color: #2a7a45; }
+    50% { box-shadow: 0 0 25px rgba(46, 204, 113, 0.5); border-color: #4aff92; }
+    100% { box-shadow: 0 0 15px rgba(46, 204, 113, 0.2); border-color: #2a7a45; }
+}
+
+.login-btn {
+    width: 100%;
+    height: 65px;
+    
+    /* Green Gradient */
+    background: linear-gradient(180deg, #1b5e35 0%, #052912 100%);
+    
+    border: 1px solid #2a7a45;
+    border-radius: 18px;
+    color: white;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-bottom: 40px;
+    
+    /* Apply Glow Animation */
+    animation: btn-pulse 3s infinite ease-in-out;
+    
+    transition: transform 0.1s;
+    font-family: 'Unbounded', sans-serif;
+    text-transform: uppercase;
+}
+
+.login-btn:active {
+    transform: scale(0.98);
+    filter: brightness(1.2);
+}
+
+/* Keypad Styles */
+.keypad-container {
+    width: 100%;
+    background-color: #080f0b; /* Darker bg */
+    border: 1px solid #15251d;
+    border-radius: 30px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    backdrop-filter: blur(10px);
+}
+
+.key-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.key {
+    background: transparent;
+    border: none;
+    color: #e0f2e9;
+    font-size: 28px;
+    font-weight: 500;
+    width: 33%;
+    height: 60px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+    font-family: 'Unbounded', sans-serif;
+}
+
+.key:active {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #38FF7E;
+}
+
+.key-placeholder {
+    width: 33%;
+}
+
+.backspace svg {
+    width: 28px;
+    height: 28px;
+    pointer-events: none;
+    stroke: #e0f2e9;
+}
+
+.backspace:active svg {
+    stroke: #38FF7E;
+}
