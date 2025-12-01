@@ -1,6 +1,26 @@
+// --- FIREBASE IMPORTS (Must be at the top) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+// --- CONFIGURATION ---
+const firebaseConfig = {
+    apiKey: "AIzaSyBWKNOFsaM0VIwZCgz-fxocwjkAY72mefg",
+    authDomain: "fyber-mini-app.firebaseapp.com",
+    databaseURL: "https://fyber-mini-app-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "fyber-mini-app",
+    storageBucket: "fyber-mini-app.firebasestorage.app",
+    messagingSenderId: "622613200958",
+    appId: "1:622613200958:web:061496e31f2bafd352516f",
+    measurementId: "G-C720SK2JKJ"
+};
+
+// --- INITIALIZE FIREBASE ---
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. UI LOGIC ---
+    // --- 1. UI LOGIC (Kept exactly the same) ---
     const inputField = document.getElementById('fyber-input');
     const keypad = document.getElementById('keypad');
     const backspaceBtn = document.getElementById('backspace-btn');
@@ -37,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         input.focus();
     }
 
-    // --- 2. LOGIN LOGIC ---
+    // --- 2. LOGIN LOGIC (Updated for Firebase) ---
     loginBtn.addEventListener('click', async () => {
         const enteredID = inputField.value.trim();
 
@@ -51,23 +71,20 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBtn.textContent = "Checking...";
 
         try {
-            // Fetch the JSON file
-            // ПРИМІТКА: Якщо ви на GitHub Pages, тут краще вказати повне посилання:
-            // https://ваш-нік.github.io/репо/json_handler/balances.json
-            const response = await fetch('../json_handler/balances.json');
+            // Reference to the database root
+            const dbRef = ref(db);
             
-            if (!response.ok) {
-                throw new Error("Could not connect to database");
-            }
+            // fetch ONLY the specific ID node (more efficient/secure than downloading the whole DB)
+            const snapshot = await get(child(dbRef, enteredID));
 
-            const balancesData = await response.json();
-
-            if (balancesData.hasOwnProperty(enteredID)) {
-                
+            if (snapshot.exists()) {
                 // SUCCESS
-                const userData = balancesData[enteredID]; // This is now an object
-                const userBalance = userData.balance;     // Get balance
-                const userName = userData.username;       // Get username
+                const userData = snapshot.val();
+                
+                // Extract data (handling the object structure from Python)
+                const userBalance = userData.balance; 
+                const userName = userData.username;
+
                 console.log(`User ${enteredID} logged in.`);
 
                 // Save to localStorage
@@ -79,15 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = "dashboard.html"; 
 
             } else {
-                // FAIL
+                // FAIL (ID does not exist in Firebase)
                 alert("❌ Invalid ID\nUser not found.");
                 inputField.value = ""; 
                 loginBtn.textContent = originalText;
             }
 
         } catch (error) {
-            console.error(error);
-            alert("Connection error (check console)");
+            console.error("Firebase Login Error:", error);
+            alert("Connection error. Please try again.");
             loginBtn.textContent = originalText;
         }
     });

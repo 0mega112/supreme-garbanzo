@@ -98,11 +98,11 @@
         </a>
     </nav>
 
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', async () => {
-            const savedID = localStorage.getItem("fyber_current_id");
-            const savedBal = localStorage.getItem("fyber_current_balance");
-            document.getElementById('balance-amount').textContent = '$' + savedBal;
+            // const savedID = localStorage.getItem("fyber_current_id");
+            // const savedBal = localStorage.getItem("fyber_current_balance");
+            // document.getElementById('balance-amount').textContent = '$' + savedBal;
             
             // if (savedBal) document.getElementById('balance-amount').textContent = savedBal;
 
@@ -161,6 +161,52 @@
         // 3. Add the 'active' class to the clicked button
         element.classList.add('active');
     }
+
+        // 1. FIREBASE IMPORTS
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // 2. CONFIGURATION (Same as login)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWKNOFsaM0VIwZCgz-fxocwjkAY72mefg",
+            authDomain: "fyber-mini-app.firebaseapp.com",
+            databaseURL: "https://fyber-mini-app-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "fyber-mini-app",
+            storageBucket: "fyber-mini-app.firebasestorage.app",
+            messagingSenderId: "622613200958",
+            appId: "1:622613200958:web:061496e31f2bafd352516f",
+            measurementId: "G-C720SK2JKJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 3. GET LOGGED IN USER
+        const userId = localStorage.getItem("fyber_current_id");
+
+        if (!userId) {
+            // If no one is logged in, send them back to login page
+            window.location.href = "index.html";
+        } else {
+            console.log("Listening for updates for user:", userId);
+
+            // 4. LISTEN FOR REAL-TIME UPDATES
+            const userRef = ref(db, '/' + userId);
+
+            onValue(userRef, (snapshot) => {
+                const data = snapshot.val();
+          
+                if (data) {
+                    // REPLACE 'balance-display' WITH THE ID OF YOUR BALANCE HTML ELEMENT
+                    const balanceElement = document.getElementById('balance-amount');
+                                // document.getElementById('display-balance').textContent = '$' + savedBal;
+
+                    if (balanceElement) {
+                        balanceElement.textContent = '$' + data.balance; 
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>

@@ -65,50 +65,108 @@
         
     </nav>
 
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', async () => {
             // 1. Отримуємо ID, який зберіг екран входу
             const savedID = localStorage.getItem("fyber_current_id");
+            // const savedBal = localStorage.getItem("fyber_current_balance");
+            // const userName = localStorage.getItem("fyber_username");
             
-            // Якщо ID немає, викидаємо на вхід
-            if (!savedID) { 
-                window.location.href = "index.html"; 
-                return; 
-            }
-            
-            // Показуємо ID
+            // document.getElementById('display-username').textContent = userName;
+            // document.getElementById('display-balance').textContent = '$' + savedBal;
             document.getElementById('display-id').textContent = savedID;
+            
+        //     // Якщо ID немає, викидаємо на вхід
+        //     if (!savedID) { 
+        //         window.location.href = "index.html"; 
+        //         return; 
+        //     }
+            
+        //     // Показуємо ID
+        //     document.getElementById('display-id').textContent = savedID;
 
-            try {
-                // 2. Робимо запит до файлу балансів
-                // Важливо: шлях має бути правильним відносно html файлу
-                const response = await fetch('../json_handler/balances.json'); 
+        //     try {
+        //         // 2. Робимо запит до файлу балансів
+        //         // Важливо: шлях має бути правильним відносно html файлу
+        //         const response = await fetch('../json_handler/balances.json'); 
                 
-                if (response.ok) {
-                    const data = await response.json();
+        //         if (response.ok) {
+        //             const data = await response.json();
                     
-                    // 3. Шукаємо користувача по ID в JSON
-                    const userData = data[savedID];
+        //             // 3. Шукаємо користувача по ID в JSON
+        //             const userData = data[savedID];
                     
-                    if (userData) {
-                        // Оновлюємо дані на сторінці
-                        document.getElementById('display-balance').textContent = '$' + userData.balance;
+        //             if (userData) {
+        //                 // Оновлюємо дані на сторінці
+        //                 document.getElementById('display-balance').textContent = '$' + userData.balance;
                         
-                        // Перевірка, чи є ім'я, інакше ставимо дефолт
-                        const userName = userData.username || "USER";
-                        document.getElementById('display-username').textContent = userName;
-                    }
-                } else {
-                    console.error("Не вдалося завантажити balances.json");
-                }
-            } catch (e) {
-                console.error("Помилка з'єднання:", e);
-            }
+        //                 // Перевірка, чи є ім'я, інакше ставимо дефолт
+        //                 const userName = userData.username || "USER";
+        //                 document.getElementById('display-username').textContent = userName;
+        //             }
+        //         } else {
+        //             console.error("Не вдалося завантажити balances.json");
+        //         }
+        //     } catch (e) {
+        //         console.error("Помилка з'єднання:", e);
+        //     }
         });
 
         function logout() { 
             localStorage.clear(); 
             window.location.href = "index.html"; 
+        }
+
+        // 1. FIREBASE IMPORTS
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // 2. CONFIGURATION (Same as login)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBWKNOFsaM0VIwZCgz-fxocwjkAY72mefg",
+            authDomain: "fyber-mini-app.firebaseapp.com",
+            databaseURL: "https://fyber-mini-app-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "fyber-mini-app",
+            storageBucket: "fyber-mini-app.firebasestorage.app",
+            messagingSenderId: "622613200958",
+            appId: "1:622613200958:web:061496e31f2bafd352516f",
+            measurementId: "G-C720SK2JKJ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // 3. GET LOGGED IN USER
+        const userId = localStorage.getItem("fyber_current_id");
+
+        if (!userId) {
+            // If no one is logged in, send them back to login page
+            window.location.href = "index.html";
+        } else {
+            console.log("Listening for updates for user:", userId);
+
+            // 4. LISTEN FOR REAL-TIME UPDATES
+            const userRef = ref(db, '/' + userId);
+
+            onValue(userRef, (snapshot) => {
+                const data = snapshot.val();
+          
+                if (data) {
+                    // REPLACE 'balance-display' WITH THE ID OF YOUR BALANCE HTML ELEMENT
+                    const balanceElement = document.getElementById('display-balance');
+                                // document.getElementById('display-balance').textContent = '$' + savedBal;
+
+                    if (balanceElement) {
+                        balanceElement.textContent = '$' + data.balance; 
+                    }
+              
+                    // Optional: Update username if you show it
+                    const nameElement = document.getElementById('display-username');
+                    if (nameElement) {
+                        nameElement.innerText = data.username;
+                    }
+                }
+            });
         }
     </script>
 </body>
