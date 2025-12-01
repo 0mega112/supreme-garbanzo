@@ -66,62 +66,11 @@
     </nav>
 
     <script type="module">
-        document.addEventListener('DOMContentLoaded', async () => {
-            // 1. Отримуємо ID, який зберіг екран входу
-            const savedID = localStorage.getItem("fyber_current_id");
-            // const savedBal = localStorage.getItem("fyber_current_balance");
-            // const userName = localStorage.getItem("fyber_username");
-            
-            // document.getElementById('display-username').textContent = userName;
-            // document.getElementById('display-balance').textContent = '$' + savedBal;
-            document.getElementById('display-id').textContent = savedID;
-            
-        //     // Якщо ID немає, викидаємо на вхід
-        //     if (!savedID) { 
-        //         window.location.href = "index.html"; 
-        //         return; 
-        //     }
-            
-        //     // Показуємо ID
-        //     document.getElementById('display-id').textContent = savedID;
-
-        //     try {
-        //         // 2. Робимо запит до файлу балансів
-        //         // Важливо: шлях має бути правильним відносно html файлу
-        //         const response = await fetch('../json_handler/balances.json'); 
-                
-        //         if (response.ok) {
-        //             const data = await response.json();
-                    
-        //             // 3. Шукаємо користувача по ID в JSON
-        //             const userData = data[savedID];
-                    
-        //             if (userData) {
-        //                 // Оновлюємо дані на сторінці
-        //                 document.getElementById('display-balance').textContent = '$' + userData.balance;
-                        
-        //                 // Перевірка, чи є ім'я, інакше ставимо дефолт
-        //                 const userName = userData.username || "USER";
-        //                 document.getElementById('display-username').textContent = userName;
-        //             }
-        //         } else {
-        //             console.error("Не вдалося завантажити balances.json");
-        //         }
-        //     } catch (e) {
-        //         console.error("Помилка з'єднання:", e);
-        //     }
-        });
-
-        function logout() { 
-            localStorage.clear(); 
-            window.location.href = "index.html"; 
-        }
-
         // 1. FIREBASE IMPORTS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // 2. CONFIGURATION (Same as login)
+        // 2. CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBWKNOFsaM0VIwZCgz-fxocwjkAY72mefg",
             authDomain: "fyber-mini-app.firebaseapp.com",
@@ -136,37 +85,80 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // 3. GET LOGGED IN USER
-        const userId = localStorage.getItem("fyber_current_id");
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 3. GET USER ID & CHECK LOGIN
+            const userId = localStorage.getItem("fyber_current_id");
+            const displayIdEl = document.getElementById('display-id');
 
-        if (!userId) {
-            // If no one is logged in, send them back to login page
-            window.location.href = "index.html";
-        } else {
+            if (!userId) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            // Show ID immediately from local storage while loading
+            if(displayIdEl) displayIdEl.textContent = userId;
+
             console.log("Listening for updates for user:", userId);
 
-            // 4. LISTEN FOR REAL-TIME UPDATES
+            // 4. FIREBASE LISTENER
             const userRef = ref(db, '/' + userId);
 
             onValue(userRef, (snapshot) => {
                 const data = snapshot.val();
           
                 if (data) {
-                    // REPLACE 'balance-display' WITH THE ID OF YOUR BALANCE HTML ELEMENT
                     const balanceElement = document.getElementById('display-balance');
-                                // document.getElementById('display-balance').textContent = '$' + savedBal;
-
-                    if (balanceElement) {
-                        balanceElement.textContent = '$' + data.balance; 
-                    }
-              
-                    // Optional: Update username if you show it
                     const nameElement = document.getElementById('display-username');
+
+                    // A. Update Name
                     if (nameElement) {
-                        nameElement.innerText = data.username;
+                        nameElement.innerText = data.username || "USER";
+                    }
+
+                    // B. Animate Balance (From 0 to Target)
+                    if (balanceElement) {
+                        const targetBalance = parseInt(data.balance, 10) || 0;
+                        // Run the counting animation
+                        animateValue(balanceElement, 0, targetBalance, 2500); 
                     }
                 }
             });
+        });
+
+        /**
+         * ANIMATION FUNCTION
+         * counts from start to end, slowing down at the end
+         */
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                
+                // Calculate progress (0 to 1)
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+                // --- EASING FORMULA (EaseOutExpo) ---
+                // This makes the counter start fast and slow down heavily at the end
+                const easeProgress = (progress === 1) ? 1 : 1 - Math.pow(2, -10 * progress);
+
+                // Calculate current number
+                const currentVal = Math.floor(easeProgress * (end - start) + start);
+
+                // Update Text (Format: 10 500 $)
+                obj.textContent = currentVal.toLocaleString('ru-RU') + ' $';
+
+                // Continue loop if not finished
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    // Ensure it ends on the exact number
+                    obj.textContent = end.toLocaleString('ru-RU') + ' $';
+                }
+            };
+
+            window.requestAnimationFrame(step);
         }
     </script>
 </body>

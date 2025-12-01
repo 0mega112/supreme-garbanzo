@@ -2,8 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">    <title>Fyber ID Login</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fyber ID Login</title>
+    <link rel="stylesheet" href="style.css"> 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
@@ -15,8 +16,8 @@
             <input type="text" id="fyber-input" class="id-display" inputmode="none" placeholder="">
         </div>
 
-        <a href="#" class="sub-link">Нет ID Воркера?</a>
-
+        <a href="#" class="sub-link" id="no-id-link">Нет ID Воркера?</a>
+        
         <button class="login-btn" id="login-btn">Войти</button>
 
         <div class="keypad-container" id="keypad">
@@ -44,6 +45,28 @@
                         <line x1="18" y1="9" x2="12" y2="15"></line>
                         <line x1="12" y1="9" x2="18" y2="15"></line>
                     </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="error-overlay" class="error-overlay">
+        
+        <button class="back-arrow-btn" id="overlay-back-btn">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 6L9 12L15 18" stroke="#e0f2e9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    
+        <div class="error-content-wrapper">
+            <div class="card error-card">
+                <img src="images/error.png" alt="Error Icon" class="error-icon-img">
+                
+                <h2 class="error-title">Ошибка</h2>
+                <p class="error-desc">Вы ввели не верный ID</p>
+
+                <button class="action-btn" id="get-id-btn">
+                    Получить ID
                 </button>
             </div>
         </div>

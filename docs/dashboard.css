@@ -149,11 +149,6 @@ body::before {
     100% { box-shadow: inset 0 0 10px var(--glow-custom), 0 0 5px var(--glow-custom); border-color: #2ecc71; }
 }
 
-@keyframes slide-up-fade {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
 /* --- GLOWING BALANCE BOX --- */
 .balance-display-box {
     width: 100%;
@@ -164,8 +159,9 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* ONLY the balance box has the slide-up-fade animation now */
-    animation: slide-up-fade 0.8s ease-out forwards, pulse-glow 4s infinite ease-in-out;
+    
+    /* ONLY Pulse animation. Removed slide-up-fade */
+    animation: pulse-glow 4s infinite ease-in-out;
 }
 
 .balance-amount {
@@ -174,6 +170,10 @@ body::before {
     color: #38FF7E; 
     text-shadow: none;
     letter-spacing: 0.5px;
+    
+    /* Ensure no animation is affecting the text transform */
+    transform: none;
+    opacity: 1;
 }
 
 /* --- Profile Card --- */

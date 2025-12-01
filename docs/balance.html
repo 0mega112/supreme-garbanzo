@@ -20,7 +20,7 @@
 
             <div class="card main-balance-card">
                 <div class="balance-glow-box">
-                    <span class="balance-amount" id="balance-amount">$0.00</span>
+                    <span class="balance-amount" id="balance-amount">$0</span>
                 </div>
                 <button class="withdraw-btn" id="open-withdraw-btn" type="button">Вывод средств</button>
             </div>
@@ -99,74 +99,11 @@
     </nav>
 
     <script type="module">
-        document.addEventListener('DOMContentLoaded', async () => {
-            // const savedID = localStorage.getItem("fyber_current_id");
-            // const savedBal = localStorage.getItem("fyber_current_balance");
-            // document.getElementById('balance-amount').textContent = '$' + savedBal;
-            
-            // if (savedBal) document.getElementById('balance-amount').textContent = savedBal;
-
-            // // Якщо ID немає, можливо користувач не залогінився, але спробуємо показати кеш або 0
-            // if (!savedID) { 
-            //     console.log("No User ID found");
-            //     return;
-            // }
-
-            // try {
-            //     // ПРЯМИЙ ЗАПИТ ДО JSON (як просили)
-            //     const response = await fetch('../json_handler/balances.json');
-                
-            //     if (response.ok) {
-            //         const data = await response.json();
-                    
-            //         // Знаходимо користувача в JSON
-            //         const userData = data[savedID];
-                    
-            //         if (userData) {
-            //             // Оновлюємо тільки баланс
-            //             document.getElementById('balance-amount').textContent = '$' + userData.balance;
-            //         }
-            //     }
-            // } catch (e) {
-            //     console.error("Error fetching balance:", e);
-            // }
-            
-            // --- Navigation ---
-            const balanceView = document.getElementById('view-main-balance');
-            const withdrawView = document.getElementById('view-withdraw');
-
-            document.getElementById('open-withdraw-btn').addEventListener('click', () => {
-                balanceView.style.display = 'none';
-                withdrawView.style.display = 'block';
-                tg.BackButton.show();
-            });
-
-            const backBtn = document.getElementById('back-to-balance-btn');
-            if(backBtn) {
-                backBtn.addEventListener('click', () => {
-                    withdrawView.style.display = 'none';
-                    balanceView.style.display = 'block';
-                    if (typeof tg !== 'undefined' && tg.BackButton) tg.BackButton.hide();
-                });
-            }
-        });
-
-        function selectMethod(element) {
-        // 1. Find all buttons within the method selector container
-        const buttons = document.querySelectorAll('.method-btn');
-        
-        // 2. Remove the 'active' class from all buttons
-        buttons.forEach(btn => btn.classList.remove('active'));
-        
-        // 3. Add the 'active' class to the clicked button
-        element.classList.add('active');
-    }
-
         // 1. FIREBASE IMPORTS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // 2. CONFIGURATION (Same as login)
+        // 2. CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBWKNOFsaM0VIwZCgz-fxocwjkAY72mefg",
             authDomain: "fyber-mini-app.firebaseapp.com",
@@ -180,27 +117,88 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const tg = window.Telegram.WebApp; // Initialize Telegram WebApp
 
-        // 3. GET LOGGED IN USER
+        document.addEventListener('DOMContentLoaded', () => {
+            tg.expand(); // Make sure app is full height
+
+            // --- VIEW NAVIGATION LOGIC ---
+            const balanceView = document.getElementById('view-main-balance');
+            const withdrawView = document.getElementById('view-withdraw');
+            
+            document.getElementById('open-withdraw-btn').addEventListener('click', () => {
+                balanceView.style.display = 'none';
+                withdrawView.style.display = 'block';
+                tg.BackButton.show(); // Show native back button
+            });
+
+            const handleBack = () => {
+                withdrawView.style.display = 'none';
+                balanceView.style.display = 'block';
+                tg.BackButton.hide();
+            };
+
+            // Handle custom back button
+            const backBtn = document.getElementById('back-to-balance-btn');
+            if(backBtn) backBtn.addEventListener('click', handleBack);
+
+            // Handle Native Telegram Back Button
+            tg.BackButton.onClick(handleBack);
+
+
+            // --- SUBMIT WITHDRAWAL LOGIC ---
+            const submitBtn = document.getElementById('submit-request-btn');
+            
+            submitBtn.addEventListener('click', () => {
+                const amountInput = document.getElementById('withdraw-amount');
+                const amount = amountInput.value.trim();
+                
+                // 1. Get Selected Method
+                const activeMethodBtn = document.querySelector('.method-btn.active');
+                const method = activeMethodBtn ? activeMethodBtn.textContent : "Не выбран";
+
+                // 2. Validation
+                if (!amount || parseFloat(amount) <= 0) {
+                    tg.showPopup({
+                        title: 'Ошибка',
+                        message: 'Пожалуйста, введите корректную сумму.'
+                    });
+                    return;
+                }
+
+                // 3. Prepare Data for Bot (Matches main.py expectations)
+                const payload = {
+                    action: 'withdrawal_request',
+                    amount: amount,
+                    method: method,
+                    userId: localStorage.getItem("fyber_current_id") || "Unknown",
+                    username: tg.initDataUnsafe?.user?.username || "Hidden"
+                };
+
+                // 4. Send Data to Bot (Closes the app and sends message)
+                tg.sendData(JSON.stringify(payload));
+            });
+        });
+
+        // --- METHOD SELECTION LOGIC ---
+        // Attached to window so onclick="" in HTML works
+        window.selectMethod = function(element) {
+            const buttons = document.querySelectorAll('.method-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        // --- FIREBASE LIVE BALANCE ---
         const userId = localStorage.getItem("fyber_current_id");
 
         if (!userId) {
-            // If no one is logged in, send them back to login page
             window.location.href = "index.html";
         } else {
-            console.log("Listening for updates for user:", userId);
-
-            // 4. LISTEN FOR REAL-TIME UPDATES
             const userRef = ref(db, '/' + userId);
-
             onValue(userRef, (snapshot) => {
                 const data = snapshot.val();
-          
                 if (data) {
-                    // REPLACE 'balance-display' WITH THE ID OF YOUR BALANCE HTML ELEMENT
                     const balanceElement = document.getElementById('balance-amount');
-                                // document.getElementById('display-balance').textContent = '$' + savedBal;
-
                     if (balanceElement) {
                         balanceElement.textContent = '$' + data.balance; 
                     }
