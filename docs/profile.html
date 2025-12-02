@@ -5,24 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fyber Profile</title>
     <link rel="stylesheet" href="profile.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body class="profile-page">
 
     <div class="page-container">
         
-        <!-- Header -->
         <header class="page-header">
             <h1 class="page-title">Профиль</h1>
         </header>
 
-        <!-- User Info Card -->
         <div class="card user-info-card">
-            <!-- Left: Avatar -->
-                <div class="avatar-box">
+            <div class="avatar-box">
                     <img src="images/user.png" alt="User" class="avatar-img">
                 </div>
 
-            <!-- Right: Info -->
             <div class="info-container">
                 <h2 class="username" id="display-username">LOADING...</h2>
                 <p class="user-id">ID: <span id="display-id">...</span></p>
@@ -32,16 +29,13 @@
             </div>
         </div>
 
-        <!-- Action Menu Links -->
         <div class="menu-list">
             
-            <!-- 1. Main Manager -->
-            <a href="#" class="menu-card">
+            <a href="#" class="menu-card" onclick="openTgLink('https://t.me/FYBER_TEAM'); return false;">
                 <div class="menu-text">
                     Главный<br>Менеджер
                 </div>
                 <div class="menu-icon-box">
-                    <!-- Checkmark Badge -->
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
@@ -49,26 +43,22 @@
                 </div>
             </a>
 
-            <!-- 2. Reviews Group -->
-            <a href="#" class="menu-card">
+            <a href="#" class="menu-card" onclick="openTgLink('https://t.me/reviewsFYBER'); return false;">
                 <div class="menu-text">
                     Группа<br>Отзывов
                 </div>
                 <div class="menu-icon-box">
-                    <!-- Star Badge -->
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
                     </svg>
                 </div>
             </a>
 
-            <!-- 3. Profits Group -->
-            <a href="#" class="menu-card">
+            <a href="#" class="menu-card" onclick="openTgLink('https://t.me/profitsFYBER'); return false;">
                 <div class="menu-text">
                     Группа<br>Профитов
                 </div>
                 <div class="menu-icon-box">
-                    <!-- Dollar Badge -->
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="1" x2="12" y2="23"></line>
                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
@@ -80,14 +70,11 @@
 
     </div>
 
-    <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-        <!-- Home (Link) -->
         <a href="dashboard.html" class="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         </a>
         
-        <!-- Balance (Link) -->
         <a href="balance.html" class="nav-item">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -95,7 +82,6 @@
             </svg>
         </a>
         
-        <!-- Profile (Active Pill) -->
         <a href="#" class="nav-item active">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
             <span>Профиль</span>
@@ -110,7 +96,23 @@
 
             if (savedID) document.getElementById('display-id').textContent = savedID;
             if (savedName) document.getElementById('display-username').textContent = savedName;
+            
+            // Expand app just in case
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.expand();
+            }
         });
+
+        // --- NEW: FUNCTION TO OPEN TELEGRAM LINKS NATIVELY ---
+        function openTgLink(url) {
+            if (window.Telegram && window.Telegram.WebApp) {
+                // This opens the chat instantly inside Telegram
+                window.Telegram.WebApp.openTelegramLink(url);
+            } else {
+                // Fallback for browser testing
+                window.location.href = url;
+            }
+        }
 
         // Copy ID Logic
         function copyToClipboard() {

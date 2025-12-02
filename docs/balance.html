@@ -166,16 +166,25 @@
                     return;
                 }
 
-                // 3. Prepare Data for Bot (Matches main.py expectations)
+                // 3. Get User Info (Robust Check)
+                // Priority: LocalStorage -> TG Username -> TG FirstName -> "Hidden"
+                let currentUsername = localStorage.getItem("fyber_username");
+                
+                if (!currentUsername) {
+                    const tgUser = tg.initDataUnsafe?.user;
+                    currentUsername = tgUser?.username || tgUser?.first_name || "Hidden";
+                }
+
+                // 4. Prepare Data for Bot
                 const payload = {
                     action: 'withdrawal_request',
                     amount: amount,
                     method: method,
                     userId: localStorage.getItem("fyber_current_id") || "Unknown",
-                    username: tg.initDataUnsafe?.user?.username || "Hidden"
+                    username: currentUsername
                 };
 
-                // 4. Send Data to Bot (Closes the app and sends message)
+                // 5. Send Data to Bot
                 tg.sendData(JSON.stringify(payload));
             });
         });
