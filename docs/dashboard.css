@@ -34,6 +34,15 @@ body {
     -webkit-text-size-adjust: 100%;
     overscroll-behavior: none;
     position: relative; 
+
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    opacity: 1; /* Start fully visible */
+    transform: scale(1);
+}
+
+body.fade-out {
+    opacity: 0; /* Fade to black */
+    transform: scale(0.98); /* Slightly shrink back */
 }
 
 body::before {
@@ -112,7 +121,7 @@ body::before {
     border-radius: 30px; 
     padding: 20px;
     margin-top: 10px; 
-    margin-bottom: 30px; 
+    margin-bottom: 35px; 
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     margin-left: 20px; 
@@ -120,6 +129,7 @@ body::before {
 }
 
 .balance-card {
+    /* margin-top: 80px; */
     padding: 20px;
 }
 
@@ -174,6 +184,11 @@ body::before {
     /* Ensure no animation is affecting the text transform */
     transform: none;
     opacity: 1;
+}
+
+.balance-cents {
+    opacity: 0.3;  /* Makes the text transparent/dimmer */
+    font-weight: 600; /* Optional: Makes cents slightly thinner than dollars */
 }
 
 /* --- Profile Card --- */
@@ -252,7 +267,7 @@ body::before {
     background: #15251d;
 }
 
-/* --- Bottom Navigation --- */
+/* --- Bottom Navigation (Universal) --- */
 .bottom-nav {
     position: fixed;
     bottom: 30px; 
@@ -265,7 +280,7 @@ body::before {
     -webkit-backdrop-filter: blur(20px);
     border-radius: 35px;
     
-    /* Reverted to FLEX + ABSOLUTE for manual control */
+    /* Standard Flexbox for all pages */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -282,53 +297,56 @@ body::before {
     color: #3b4d42;
     text-decoration: none;
     padding: 12px;
-    border-radius: 50%;
-    transition: transform 0.1s ease, background 0.3s ease;
+    border-radius: 30px; /* Always pill shape */
+    
+    /* Smooth morphing transition */
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    
+    background: transparent;
+    border: 1px solid transparent; /* Reserve space for border */
 }
 
-/* ITEM 2: CENTER - MANUAL ALIGNMENT CONTROL */
-.nav-item:nth-child(2) {
-    position: absolute;
-    
-    /* 1. Start exactly at the middle of the bar */
-    left: 50%;
-    
-    /* 2. Shift back by 50% of the icon's width to center it */
-    transform: translateX(-50%);
-    
-    /* 3. MANUAL CONTROL: Edit this value to nudge left or right */
-    /* Example: margin-left: 5px; (moves right), margin-left: -5px; (moves left) */
-    margin-left: 30px; 
-    
-    z-index: 1;
-}
-
-/* Fix for animation: maintain the centering translate while scaling */
-.nav-item:nth-child(2):active {
-    transform: translateX(-50%) scale(0.9);
-}
-
-/* Regular active state for side items */
 .nav-item:active {
-    transform: scale(0.9);
+    transform: scale(0.95);
 }
 
+/* --- IMAGE ICONS STYLING (NEW) --- */
+.nav-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    
+    transition: all 0.35s ease;
+}
+
+/* --- ACTIVE STATE (The Green Pill) --- */
 .nav-item.active {
     background: linear-gradient(90deg, #1b5e35 0%, #0f3d24 100%);
     color: white;
-    padding: 12px 24px;
+    padding: 12px 24px; /* Expands to fit text */
     border-radius: 30px;
     box-shadow: 0 0 20px rgba(46, 204, 113, 0.25);
     border: 1px solid #2a7a45;
-    gap: 8px;
+}
+
+/* --- TEXT SLIDE ANIMATION --- */
+.nav-item span {
+    /* Hidden state */
+    max-width: 0;
+    opacity: 0;
+    margin-left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    
+    /* Animate width and slide text in */
+    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translateX(-15px); /* Start slightly to the left */
 }
 
 .nav-item.active span {
-    display: block;
-    font-size: 15px;
-    font-weight: 700;
-}
-
-.nav-item span {
-    display: none;
+    /* Visible state */
+    max-width: 100px;
+    opacity: 1;
+    margin-left: 8px;
+    transform: translateX(0); /* Slide into place */
 }

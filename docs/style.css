@@ -377,3 +377,23 @@ body::before {
 .back-arrow-btn svg path {
     stroke: #e0f2e9; /* Light Mint Green */
 }
+
+/* --- ERROR MODAL ANIMATION --- */
+
+/* 1. Define the bounce animation */
+@keyframes modalPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px); /* Starts smaller and lower */
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0); /* Ends full size and centered */
+    }
+}
+
+/* 2. Apply animation ONLY when the overlay has the 'active' class */
+.error-overlay.active .error-card {
+    /* The cubic-bezier creates the "bouncy" effect */
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}

@@ -28,8 +28,7 @@
                 <a href="balance.html" class="details-link">Подробнее ></a>
             </div>
             <div class="balance-display-box">
-                <span id="display-balance" class="balance-amount">$0</span>
-            </div>
+                <span id="display-balance" class="balance-amount">$0<span class="balance-cents">.00</span></span>            </div>
         </div>
 
         <!-- Profile Card -->
@@ -48,21 +47,17 @@
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
         <a href="#" class="nav-item active">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <img src="images/dashboard_white.png" alt="Menu" class="nav-icon">
             <span>Меню</span>
         </a>
+
         <a href="balance.html" class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
+            <img src="images/balance.png" alt="Balance" class="nav-icon">
         </a>
+
         <a href="profile.html" class="nav-item">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-            </svg>
+            <img src="images/profile.png" alt="Profile" class="nav-icon">
         </a>
-        
     </nav>
 
     <script type="module">
@@ -85,9 +80,41 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
+        // 3. ANIMATION FUNCTION (Quintic Ease-Out)
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                
+                const runtime = Math.min((timestamp - startTimestamp) / duration, 1);
+                
+                // --- CHANGED HERE: Power of 5 (Quintic) for extreme slow-down ---
+                const progress = 1 - Math.pow(1 - runtime, 5);
+                
+                const current = start + (progress * (end - start));
+                
+                // Formatting
+                const valStr = current.toFixed(2);     
+                const parts = valStr.split('.');       
+                
+                // Inject HTML with the dimmer class
+                obj.innerHTML = `$${parts[0]}<span class="balance-cents">.${parts[1]}</span>`;
+
+                if (runtime < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    // Final state: ensure exact value and correct style
+                    const endStr = end.toFixed(2);
+                    const endParts = endStr.split('.');
+                    obj.innerHTML = `$${endParts[0]}<span class="balance-cents">.${endParts[1]}</span>`;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             
-            // 3. GET USER ID & CHECK LOGIN
+            // 4. GET USER ID & CHECK LOGIN
             const userId = localStorage.getItem("fyber_current_id");
             const displayIdEl = document.getElementById('display-id');
 
@@ -96,12 +123,9 @@
                 return;
             }
 
-            // Show ID immediately from local storage while loading
             if(displayIdEl) displayIdEl.textContent = userId;
 
-            console.log("Listening for updates for user:", userId);
-
-            // 4. FIREBASE LISTENER
+            // 5. FIREBASE LISTENER
             const userRef = ref(db, '/' + userId);
 
             onValue(userRef, (snapshot) => {
@@ -109,57 +133,58 @@
           
                 if (data) {
                     const balanceElement = document.getElementById('display-balance');
-                    const nameElement = document.getElementById('display-username');
 
-                    // A. Update Name
-                    if (nameElement) {
-                        nameElement.innerText = data.username || "USER";
-                    }
-
-                    // B. Animate Balance (From 0 to Target)
                     if (balanceElement) {
-                        const targetBalance = parseInt(data.balance, 10) || 0;
-                        // Run the counting animation
-                        animateValue(balanceElement, 0, targetBalance, 2500); 
+                        // Use innerText to grab just the visible text, remove symbols
+                        let startVal = parseFloat(balanceElement.innerText.replace(/[$,]/g, '')) || 0;
+                        let endVal = parseFloat(data.balance);
+
+                        if (startVal !== endVal) {
+                            // CHANGED: 4000ms (4 seconds) for a long, smooth finish
+                            animateValue(balanceElement, startVal, endVal, 4000); 
+                        } else {
+                            // Static update
+                            const endStr = endVal.toFixed(2);
+                            const endParts = endStr.split('.');
+                            balanceElement.innerHTML = `$${endParts[0]}<span class="balance-cents">.${endParts[1]}</span>`;
+                        }
+                    }
+              
+                    const nameElement = document.getElementById('display-username');
+                    if (nameElement) {
+                        nameElement.innerText = data.username;
                     }
                 }
             });
+
+            // ======================================================
+            // UPDATED NAVIGATION LOGIC (Paste this into script section)
+            // ======================================================
+            const navItems = document.querySelectorAll('.nav-item');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const href = item.getAttribute('href');
+                    
+                    // Check if it is a valid link to a different page
+                    if (href && href !== '#' && !item.classList.contains('active')) {
+                        e.preventDefault(); // Stop instant reload
+                        
+                        // 1. Animate the Bottom Pill (Visual Swap)
+                        document.querySelector('.nav-item.active')?.classList.remove('active');
+                        item.classList.add('active');
+                        
+                        // 2. Animate the Whole Page (Fade Out)
+                        document.body.classList.add('fade-out');
+                        
+                        // 3. Wait 350ms for animations to finish, THEN go to next page
+                        setTimeout(() => {
+                            window.location.href = href;
+                        }, 350);
+                    }
+                });
+            });
         });
-
-        /**
-         * ANIMATION FUNCTION
-         * counts from start to end, slowing down at the end
-         */
-        function animateValue(obj, start, end, duration) {
-            let startTimestamp = null;
-            
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                
-                // Calculate progress (0 to 1)
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-
-                // --- EASING FORMULA (EaseOutExpo) ---
-                // This makes the counter start fast and slow down heavily at the end
-                const easeProgress = (progress === 1) ? 1 : 1 - Math.pow(2, -10 * progress);
-
-                // Calculate current number
-                const currentVal = Math.floor(easeProgress * (end - start) + start);
-
-                // Update Text (Format: 10 500 $)
-                obj.textContent = currentVal.toLocaleString('ru-RU') + ' $';
-
-                // Continue loop if not finished
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                } else {
-                    // Ensure it ends on the exact number
-                    obj.textContent = end.toLocaleString('ru-RU') + ' $';
-                }
-            };
-
-            window.requestAnimationFrame(step);
-        }
     </script>
 </body>
 </html>
