@@ -34,7 +34,7 @@ body {
     overscroll-behavior: none;
     position: relative;
 
-    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
     opacity: 1; /* Start fully visible */
     transform: scale(1);
 }
@@ -178,7 +178,7 @@ body::before {
 .menu-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
 /* --- ADDED ANIMATION KEYFRAMES --- */
@@ -193,32 +193,79 @@ body::before {
     }
 }
 
+/* Find .menu-card and update it (specifically the overflow property) */
 .menu-card {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Keeps text on left */
     align-items: center;
     text-decoration: none;
     
-    /* UPDATED GRADIENT based on your screenshot settings */
-    /* Stops: 0% (#27663A), 10% (#225232), 29% (#193623), 92% (#030C07) */
+    /* Keep your gradient */
     background: linear-gradient(90deg, #27663A 0%, #225232 10%, #193623 29%, #030C07 92%);
     
     border-radius: 20px;
     padding: 15px 25px; 
-    
     border: 1px solid #1a4d2e;
     
-    position: relative;
-    overflow: hidden;
+    position: relative; /* REQUIRED for absolute positioning of images */
     height: 90px;
     
-    /* MODIFIED: Added Animation Properties */
-    opacity: 0; /* Start hidden */
+    /* CHANGED: visible allows images to overlap the edge. 
+       Set to 'hidden' if you want them cut off by the border. */
+    overflow: visible; 
+    
+    opacity: 0; 
     animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     transition: transform 0.1s;
-    
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
 }
+
+.menu-floating-img1 {
+    position: absolute;
+    right: -10px;   
+    top: 50%;
+    /* Combine transforms here if needed, or just keep the one */
+    transform: translate(10%, -50%); 
+    
+    height: 130px;
+    width: auto;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.menu-floating-img2 {
+    position: absolute;
+    right: -10px;   
+    top: 50%;
+    /* FIXED: Combined translate X and Y in one line */
+    transform: translate(10%, -50%); 
+
+    height: 130px; 
+    width: auto;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.menu-floating-img3 {
+    position: absolute;
+    right: -10px;   
+    top: 50%; /* Set to 50% generally works best as a base */
+    /* FIXED: Combined translate X and Y */
+    transform: translate(10%, -50%); 
+
+    height: 130px; 
+    width: auto;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Stack buttons so the top one is physically 'above' the bottom one */
+.menu-card:nth-child(1) { z-index: 3; }
+.menu-card:nth-child(2) { z-index: 2; }
+.menu-card:nth-child(3) { z-index: 1; }
 
 /* MODIFIED: Added delays so buttons appear one by one */
 .menu-card:nth-child(1) { animation-delay: 0.1s; }
@@ -240,21 +287,21 @@ body::before {
     z-index: 2;
 }
 
-.menu-icon-box {
+/* .menu-icon-box {
     width: 60px;
     height: 60px;
     background: #050a07; /* Dark box background for icon */
-    border-radius: 16px;
+    /* border-radius: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid #2e5545;
+    border: 1px solid #2e5545; */
     
     /* The "3D / Sticker" look (Rotated) */
-    transform: rotate(8deg);
+    /* transform: rotate(8deg);
     box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
-    z-index: 2;
-}
+    z-index: 2; */
+/* } */
 
 /* --- Bottom Navigation (Universal) --- */
 .bottom-nav {

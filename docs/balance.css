@@ -34,7 +34,7 @@ body {
     overscroll-behavior: none;
     position: relative;
 
-    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
     opacity: 1; /* Start fully visible */
     transform: scale(1);
 }
@@ -172,6 +172,25 @@ body::before {
     background: #15251d;
 }
 
+/* Style for the Error Message Text */
+#error-message {
+    display: none; /* Hidden by default */
+    color: #6e7f76; /* Muted grey-green text color */
+    font-size: 14px;
+    font-weight: 300;
+    text-align: left;
+    margin-top: -17px;  /* Pull closer to the title */
+    margin-bottom: 23px; /* Space between text and input box */
+    line-height: 1.4;
+    transition: opacity 0.3s ease;
+}
+
+/* Optional: To match the 'active' Input border glow from the screenshot */
+.custom-input:focus {
+    border-color: #2e4a3d;
+    box-shadow: 0 0 0 1px #2e4a3d;
+}
+
 /* --- History Section --- */
 .history-card {
     min-height: 250px;
@@ -195,8 +214,9 @@ body::before {
 .withdraw-title {
     font-size: 26px;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 25px;
     color: #fff;
+    text-align: left;
 }
 
 .withdraw-desc {

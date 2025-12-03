@@ -35,8 +35,8 @@ body {
     overscroll-behavior: none;
     position: relative; 
 
-    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
-    opacity: 1; /* Start fully visible */
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    opacity: 1; 
     transform: scale(1);
 }
 
@@ -129,7 +129,6 @@ body::before {
 }
 
 .balance-card {
-    /* margin-top: 80px; */
     padding: 20px;
 }
 
@@ -198,7 +197,6 @@ body::before {
     gap: 20px;
     padding-left: 0; 
     position: relative; 
-    /* Animation removed here */
 }
 
 .profile-icon-box {
