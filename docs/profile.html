@@ -75,7 +75,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Load data from LocalStorage
             const savedID = localStorage.getItem("fyber_current_id");
-            const savedName = localStorage.getItem("fyber_username");
+            const savedName = localStorage.getItem("fyber_nickname");
 
             if (savedID) document.getElementById('display-id').textContent = savedID;
             if (savedName) document.getElementById('display-username').textContent = savedName;

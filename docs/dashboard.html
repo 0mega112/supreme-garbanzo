@@ -37,7 +37,7 @@
                 <img src="images/user.png" alt="User Icon" class="user-avatar">
             </div>
             <div class="profile-info">
-                <h2 class="username" id="display-username">ЗАГРУЗКА...</h2>
+                <h2 class="username" id="display-username"></h2>
                 <p class="user-id">ID: <span id="display-id">...</span></p>
                 <button class="profile-btn" onclick="window.location.href='profile.html'">Профиль</button>            </div>
         </div>
@@ -150,10 +150,12 @@
                         }
                     }
               
-                    const nameElement = document.getElementById('display-username');
-                    if (nameElement) {
-                        nameElement.innerText = data.username;
-                    }
+                    // const nameElement = document.getElementById('display-username');
+                    // if (nameElement) {
+                    //     nameElement.innerText = data.username;
+                    // }
+                    const savedName = localStorage.getItem("fyber_nickname");
+                    if (savedName) document.getElementById('display-username').textContent = savedName;
                 }
             });
 

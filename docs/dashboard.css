@@ -37,12 +37,11 @@ body {
 
     transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
     opacity: 1; 
-    transform: scale(1);
 }
 
 body.fade-out {
-    opacity: 0; /* Fade to black */
-    transform: scale(0.98); /* Slightly shrink back */
+    opacity: 0;
+    transform: scale(0.98);
 }
 
 body::before {
@@ -268,6 +267,9 @@ body::before {
 /* --- Bottom Navigation (Universal) --- */
 .bottom-nav {
     position: fixed;
+
+    bottom: calc(30px + env(safe-area-inset-bottom));
+
     bottom: 30px; 
     left: 50%;
     transform: translateX(-50%);

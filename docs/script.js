@@ -18,7 +18,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// --- 1. INITIALIZE TELEGRAM (Added) ---
+// --- 1. INITIALIZE TELEGRAM ---
 const tg = window.Telegram.WebApp;
 tg.expand(); // Make sure app is full height
 
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. LOGIN LOGIC (UPDATED) ---
+    // --- 5. LOGIN LOGIC (UPDATED FOR NICKNAME) ---
     if (loginBtn) {
         loginBtn.addEventListener('click', async () => {
             const enteredID = inputField.value.trim();
@@ -111,7 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
             loginBtn.disabled = true; 
 
             try {
-                const dbRef = ref(db);
+                // const dbRef = ref(db);
+                const dbRef = ref(db, 'balances');
                 // Fetch specific ID
                 const snapshot = await get(child(dbRef, enteredID));
 
@@ -120,27 +121,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     const userData = snapshot.val();
                     const userBalance = userData.balance; 
                     
-                    // --- YOUR REQUESTED IMPLEMENTATION STARTS HERE ---
+                    // --- UPDATED IMPLEMENTATION ---
                     
-                    // 1. Try to get username from Database first
-                    let finalUsername = userData.username;
+                    // 1. Try to get NICKNAME from Database first (was username)
+                    let finalNickname = userData.nickname;
 
-                    // 2. If Database has no name, try Telegram WebApp data
-                    if (!finalUsername && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                        const tgUser = tg.initDataUnsafe.user;
-                        // Use Username, fallback to First Name, fallback to "User"
-                        finalUsername = tgUser.username || tgUser.first_name || "User";
-                    }
+                    // 2. If Database has no nickname, try Telegram WebApp data
+                    // if (!finalNickname && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    //     const tgUser = tg.initDataUnsafe.user;
+                    //     // Use Username, fallback to First Name, fallback to "User"
+                    //     finalNickname = tgUser.username || tgUser.first_name || "User";
+                    // }
 
                     // 3. Absolute fallback
-                    if (!finalUsername) finalUsername = "Fyber User";
+                    if (!finalNickname) finalNickname = userData.username;
 
-                    console.log(`User ${enteredID} logged in as ${finalUsername}.`);
+                    console.log(`User ${enteredID} logged in as ${finalNickname}.`);
 
                     // Save Data to LocalStorage
-                    localStorage.setItem("fyber_current_id", enteredID); // Using the ID they typed
+                    localStorage.setItem("fyber_current_id", enteredID); 
                     localStorage.setItem("fyber_current_balance", userBalance);
-                    localStorage.setItem("fyber_username", finalUsername); // <--- This fixes the "Hidden" issue
+                    // Updated Key to fyber_nickname
+                    localStorage.setItem("fyber_nickname", finalNickname); 
 
                     // --- IMPLEMENTATION END ---
 

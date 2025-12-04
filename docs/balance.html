@@ -23,24 +23,26 @@
             </div>
             
             <div class="card history-card animate-slide-up">
-            <div class="card-header">
-                <span class="card-label">История Профитов</span>
-                <div class="history-icon">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#e0f2e9">
-                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                    </svg>
+                <div class="card-header">
+                    <span class="card-label">История Профитов</span>
+                    <div class="history-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#e0f2e9">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                    </div>
                 </div>
-            </div>
 
-            <div class="empty-state">
-                <div class="folder-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="#1f3a2d" stroke-width="1">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                    </svg>
+                <div id="history-list" style="display: none;"></div>
+
+                <div class="empty-state" id="history-empty-state">
+                    <div class="folder-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#1f3a2d" stroke-width="1">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                    </div>
+                    <p class="empty-text">Здесь появятся<br>ваши профиты</p>
                 </div>
-                <p class="empty-text">Здесь появятся<br>ваши профиты</p>
             </div>
-        </div>
 
     </div>
 
@@ -89,8 +91,7 @@
     <script type="module">
         // 1. FIREBASE IMPORTS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
+        import { getDatabase, ref, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         // 2. CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBWKNOFsaM0VIwZCgz-fxocwjkAY72mefg",
@@ -191,7 +192,7 @@
                     const activeMethodBtn = document.querySelector('.method-btn.active');
                     const method = activeMethodBtn ? activeMethodBtn.textContent : "Не выбран";
 
-                    let currentUsername = localStorage.getItem("fyber_username");
+                    let currentUsername = localStorage.getItem("fyber_nickname");
                     if (!currentUsername) {
                         const tgUser = tg.initDataUnsafe?.user;
                         currentUsername = tgUser?.username || tgUser?.first_name || "Hidden";
@@ -236,6 +237,90 @@
                                 balanceElement.innerHTML = `$${endParts[0]}<span class="balance-cents">.${endParts[1]}</span>`;
                             }
                         }
+                    }
+                });
+            }
+
+            // --- HISTORY LOGIC: FETCH ALL PROFITS ---
+            const historyList = document.getElementById('history-list');
+            const emptyState = document.getElementById('history-empty-state');
+            const currentUserId = localStorage.getItem("fyber_current_id");
+
+            if (currentUserId && historyList) {
+                // 1. Create a query to find ALL items where sheet_id == currentUserId
+                const profitsRef = ref(db, 'profits');
+                const userProfitsQuery = query(profitsRef, orderByChild('sheet_id'), equalTo(currentUserId));
+
+                onValue(userProfitsQuery, (snapshot) => {
+                    // Clear the list before re-rendering to avoid duplicates
+                    historyList.innerHTML = '';
+                    
+                    const data = snapshot.val();
+
+                    if (data) {
+                        // Data found: Hide empty state, show list
+                        emptyState.style.display = 'none';
+                        historyList.style.display = 'flex';
+
+                        // 2. Convert object to Array and Sort by Timestamp (Newest First)
+                        const profitsArray = Object.values(data).sort((a, b) => {
+                            // Convert timestamps to Date objects for comparison
+                            return new Date(b.timestamp) - new Date(a.timestamp);
+                        });
+
+                        // 3. Loop through EVERY item and create a row
+                        profitsArray.forEach(item => {
+                            // Format Amount
+                            const amount = parseFloat(item.profit).toFixed(2);
+
+                            // Format Date & Time Separately
+                            let dateStr = "Unknown";
+                            let timeStr = "--:--";
+                            
+                            try {
+                                const dateObj = new Date(item.timestamp);
+                                if (!isNaN(dateObj)) {
+                                    const day = String(dateObj.getDate()).padStart(2, '0');
+                                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                                    const year = dateObj.getFullYear();
+                                    
+                                    const hours = String(dateObj.getHours()).padStart(2, '0');
+                                    const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                                    
+                                    dateStr = `${day}.${month}.${year}`;
+                                    timeStr = `${hours}:${minutes}`;
+                                }
+                            } catch (e) { console.log("Date error", e); }
+
+                            // Create HTML elements
+                            const row = document.createElement('div');
+                            row.className = 'history-item';
+                            
+                            // UPDATED HTML STRUCTURE TO MATCH PHOTO
+                            row.innerHTML = `
+                                <div class="history-icon-wrapper">
+                                    <img src="images/mamont.png" alt="Icon" class="history-mamont-icon">
+                                </div>
+                                
+                                <div class="history-left">
+                                    <span class="history-date">${dateStr}</span>
+                                    <span class="history-time">${timeStr}</span>
+                                </div>
+                                
+                                <div class="history-right">
+                                    <span class="history-amount">+ $${amount}</span>
+                                    <span class="history-status">Получено</span>
+                                </div>
+                            `;
+                            
+                            // Append to the list
+                            historyList.appendChild(row);
+                        });
+
+                    } else {
+                        // No data found: Show empty state
+                        emptyState.style.display = 'flex';
+                        historyList.style.display = 'none';
                     }
                 });
             }
