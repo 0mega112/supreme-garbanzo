@@ -113,6 +113,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem("fyber_nickname");
+            if (savedName) document.getElementById('display-username').textContent = savedName;
             
             // 4. GET USER ID & CHECK LOGIN
             const userId = localStorage.getItem("fyber_current_id");
@@ -151,11 +153,10 @@
                     }
               
                     // const nameElement = document.getElementById('display-username');
-                    // if (nameElement) {
-                    //     nameElement.innerText = data.username;
-                    // }
-                    const savedName = localStorage.getItem("fyber_nickname");
-                    if (savedName) document.getElementById('display-username').textContent = savedName;
+                    
+                    // const savedName = localStorage.getItem("fyber_nickname");
+                    // alert(savedName)
+                    // document.getElementById('display-username').textContent = savedName;
                 }
             });
 
