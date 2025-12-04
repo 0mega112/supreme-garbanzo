@@ -217,7 +217,7 @@
                 // If accessed directly without login, redirect
                 window.location.href = "index.html";
             } else {
-                const userRef = ref(db, '/' + userId);
+                const userRef = ref(db, 'balances/' + userId);
                 onValue(userRef, (snapshot) => {
                     const data = snapshot.val();
                     if (data) {

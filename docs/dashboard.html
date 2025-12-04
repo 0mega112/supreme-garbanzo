@@ -128,7 +128,7 @@
             if(displayIdEl) displayIdEl.textContent = userId;
 
             // 5. FIREBASE LISTENER
-            const userRef = ref(db, '/' + userId);
+            const userRef = ref(db, 'balances/' + userId);
 
             onValue(userRef, (snapshot) => {
                 const data = snapshot.val();
