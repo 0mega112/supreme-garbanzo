@@ -92,6 +92,7 @@
         // 1. FIREBASE IMPORTS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // 2. CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyBWKNOFsaM0VIwZCgz-fxocwjkAY72mefg",
@@ -106,6 +107,10 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+
+        const auth = getAuth(app);
+        signInAnonymously(auth).catch(() => {});
+        
         const tg = window.Telegram.WebApp; 
 
         // 3. ANIMATION FUNCTION (Quintic Ease-Out - Power of 5)
