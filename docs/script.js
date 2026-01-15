@@ -1,6 +1,7 @@
 // --- FIREBASE IMPORTS ---
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // --- CONFIGURATION ---
 const firebaseConfig = {
@@ -18,9 +19,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// --- 1. INITIALIZE TELEGRAM ---
+const auth = getAuth(app);
+signInAnonymously(auth).catch(() => {});
+
 const tg = window.Telegram.WebApp;
-tg.expand(); // Make sure app is full height
+tg.expand();
 
 document.addEventListener('DOMContentLoaded', () => {
     
