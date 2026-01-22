@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const getIdBtn = document.getElementById('get-id-btn'); 
 
     function openAdminChat() {
-        const adminLink = "https://t.me/TEAM_FYBER";
+        const adminLink = "https://t.me/CEO_FYBER";
         if (window.Telegram && window.Telegram.WebApp) {
             window.Telegram.WebApp.openTelegramLink(adminLink);
         } else {
